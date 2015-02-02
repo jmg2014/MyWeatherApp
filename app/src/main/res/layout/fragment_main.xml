@@ -20,14 +20,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/btn_main_location"
-            android:id="@+id/button2"
+            android:id="@+id/button_location"
+            android:onClick="showLocation"
             android:layout_gravity="center" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/btn_main_voice"
-            android:id="@+id/button3"
+            android:id="@+id/button_speech"
+            android:onClick="speech"
             android:layout_gravity="center" />
 
         <Button

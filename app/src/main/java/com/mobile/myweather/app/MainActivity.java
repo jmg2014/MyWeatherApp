@@ -9,15 +9,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
+import android.content.Context;
+import android.location.LocationManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.widget.Toast;
+import android.speech.RecognizerIntent;
+import java.util.Locale;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 
 
 public class MainActivity extends ActionBarActivity {
+
+    protected static final int REQUEST_OK = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,5 +85,62 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, ShowWeather.class);
 
         startActivity(intent);
+    }
+
+    /** Called when the user clicks the Default button */
+    public void showLocation(View view) {
+
+        LocationManager locationManager;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+        String provider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, String.valueOf(location.getLatitude())+" , "+String.valueOf(location.getLongitude()), duration);
+        toast.show();
+
+    }
+    /** Called when the user clicks Voice button */
+    public void speech(View view) {
+
+        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault().toString());
+
+        try {
+            startActivityForResult(i, REQUEST_OK);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
+        }
+
+
+
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==REQUEST_OK  && resultCode==RESULT_OK) {
+            ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+
+            String command=thingsYouSaid.get(0);
+            Toast.makeText(this, command,Toast.LENGTH_LONG).show();
+
+            //Result code for various error.
+        }else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
+            Toast.makeText(this, "Audio Error",Toast.LENGTH_LONG).show();
+        }else if(resultCode == RecognizerIntent.RESULT_CLIENT_ERROR){
+            Toast.makeText(this, "Client Error",Toast.LENGTH_LONG).show();
+        }else if(resultCode == RecognizerIntent.RESULT_NETWORK_ERROR){
+            Toast.makeText(this,"Network Error",Toast.LENGTH_LONG).show();
+        }else if(resultCode == RecognizerIntent.RESULT_NO_MATCH){
+            Toast.makeText(this, "No Match",Toast.LENGTH_LONG).show();
+        }else if(resultCode == RecognizerIntent.RESULT_SERVER_ERROR){
+            Toast.makeText(this, "Server Error",Toast.LENGTH_LONG).show();
+        }
     }
 }
