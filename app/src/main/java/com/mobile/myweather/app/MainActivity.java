@@ -146,6 +146,11 @@ public class MainActivity extends ActionBarActivity {
             String command=information.get(0);
             Toast.makeText(this, command,Toast.LENGTH_LONG).show();
 
+            Intent i = new Intent(this, ShowWeather.class);
+            i.putExtra("country", command);
+            startActivity(i);
+
+
             //Result code for various error.
         }else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
             Toast.makeText(this, "Audio Error",Toast.LENGTH_LONG).show();

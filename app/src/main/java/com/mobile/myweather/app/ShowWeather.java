@@ -15,6 +15,8 @@
  */
 package com.mobile.myweather.app;
 
+import android.content.Intent;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -31,6 +33,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.mobile.myweather.factory.FactoryFlag;
+import com.mobile.myweather.factory.FactoryWeather;
 import com.mobile.myweather.list.CustomList;
 import com.mobile.myweather.parser.RestClient;
 import com.mobile.myweather.parser.WeatherResponse;
@@ -48,11 +52,16 @@ import retrofit.client.Response;
 public class ShowWeather extends ActionBarActivity {
 
     private static String LOG_TAG=ShowWeather.class.getSimpleName();
+    private static String mCountry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_weather);
+
+        Intent intent = getIntent();
+        mCountry = intent.getExtras().getString("country");
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
@@ -139,6 +148,8 @@ public class ShowWeather extends ActionBarActivity {
             super.onViewCreated(view, savedInstanceState);
 
 
+
+
             String[] data = {
                     "    Loading...",
                     "Loading...",
@@ -216,8 +227,8 @@ public class ShowWeather extends ActionBarActivity {
             //Update icons
             Integer[] imageId = {
                     R.drawable.thermometer,
-                    R.drawable.i04d,
-                    R.drawable.uk,
+                    FactoryWeather.getFlag(result.get(8),getResources(),getActivity()),
+                    FactoryFlag.getFlag(result.get(9),getResources(),getActivity()),
                     R.drawable.wind_flag,
                     R.drawable.pressure,
                     R.drawable.humidity,
@@ -240,31 +251,33 @@ public class ShowWeather extends ActionBarActivity {
                 // Sleep for a small amount of time to simulate a background-task
                 try {
 
-                    RestClient.get().getWeather("London,uk", new Callback<WeatherResponse>() {
+                    RestClient.get().getWeather(mCountry, new Callback<WeatherResponse>() {
                         @Override
                         public void success(WeatherResponse weatherResponse, Response response) {
                             // success!
 
-                            result.add(String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp()-273.15).intValue())+"°");
+                            result.add("  "+String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp()-273.15).intValue())+"° C");
                             result.add(weatherResponse.getWeather().get(0).getMain());
                             result.add(weatherResponse.getName());
-                            result.add(String.valueOf(weatherResponse.getWind().getSpeed()));
-                            result.add(String.valueOf(weatherResponse.getMain().getPressure()));
-                            result.add(String.valueOf(weatherResponse.getMain().getHumidity()));
+                            result.add(String.valueOf(weatherResponse.getWind().getSpeed()*3.6+" km/h"));
+                            result.add(String.valueOf(weatherResponse.getMain().getPressure() +" hPa"));
+                            result.add(String.valueOf(weatherResponse.getMain().getHumidity()+" %"));
                     
                             long time=Long.valueOf(weatherResponse.getSys().getSunrise())*(long)1000;
                             Date date = new Date(time);
                             SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
                             format.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-                            result.add(format.format(date));
+                            result.add(format.format(date)+" GMT");
 
                             time=Long.valueOf(weatherResponse.getSys().getSunset())*(long)1000;
                             date = new Date(time);
 
-                            result.add(format.format(date));
+                            result.add(format.format(date)+" GMT");
+                            result.add(weatherResponse.getWeather().get(0).getIcon());
+                            result.add(weatherResponse.getSys().getCountry());
 
-
+                            Log.i("COUNTRY", weatherResponse.getSys().getCountry());
                         }
 
                         @Override
