@@ -25,6 +25,7 @@
             android:name=".ShowWeather"
             android:label="@string/title_activity_show_weather" >
         </activity>
+        <activity android:name=".PreferencesActivity"></activity>
     </application>
 
 </manifest>

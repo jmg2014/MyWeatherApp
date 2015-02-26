@@ -16,6 +16,8 @@
 package com.mobile.myweather.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -68,6 +70,7 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, PreferencesActivity.class));
             return true;
         }
 
@@ -99,9 +102,15 @@ public class MainActivity extends ActionBarActivity {
     /** Called when the user clicks the Default button */
     public void showWeather(View view) {
 
-        //Parser.getData();
-        Intent intent = new Intent(this, ShowWeather.class);
 
+        Intent intent = new Intent(this, ShowWeather.class);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+        String location=prefs.getString(getString(R.string.pref_location_key),"London,uk");
+
+
+        intent.putExtra("country", location);
         startActivity(intent);
     }
 

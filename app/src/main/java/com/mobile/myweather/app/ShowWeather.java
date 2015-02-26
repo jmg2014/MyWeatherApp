@@ -15,6 +15,8 @@
  */
 package com.mobile.myweather.app;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.nfc.Tag;
 import android.os.AsyncTask;
@@ -67,6 +69,7 @@ public class ShowWeather extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
     }
 
 
@@ -86,6 +89,7 @@ public class ShowWeather extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, PreferencesActivity.class));
             return true;
         }
 
