@@ -6,38 +6,51 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        tools:context=".MainActivity$PlaceholderFragment">
+        tools:context=".MainActivity$PlaceholderFragment"
+    android:background="@drawable/cloud">
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="120dp">
+    </View>
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="fill_parent"
             android:text="@string/btn_main_default"
             android:id="@+id/button_default"
             android:onClick="showWeather"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:background="@drawable/button_blue" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="fill_parent"
             android:text="@string/btn_main_location"
             android:id="@+id/button_location"
             android:onClick="showLocation"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:background="@drawable/button_purple" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/btn_main_voice"
-            android:id="@+id/button_speech"
-            android:onClick="speech"
-            android:layout_gravity="center" />
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="fill_parent"
+        android:text="@string/btn_main_archive"
+        android:id="@+id/button4"
+        android:layout_gravity="center"
+        android:background="@drawable/button_red" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/btn_main_archive"
-            android:id="@+id/button4"
-            android:layout_gravity="center" />
+
+    <ImageButton
+        android:layout_width="100dp"
+        android:layout_height="fill_parent"
+        android:text="@string/btn_main_voice"
+        android:id="@+id/button_speech"
+        android:onClick="speech"
+        android:layout_gravity="center"
+        android:src="@android:drawable/ic_btn_speak_now"
+        android:background="@drawable/button_black" />
     </LinearLayout>
 
 
