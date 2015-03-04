@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:context=".MainActivity$PlaceholderFragment">
+
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="300dp"
+        android:id="@+id/imageView"
+        android:src="@drawable/cloud" />
+
+
+
+        <ImageButton
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:text="@string/btn_main_default"
+                android:id="@+id/button_default"
+                android:onClick="showWeather"
+
+                android:src="@drawable/home"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+                android:background="@drawable/button_blue" />
+
+        <ImageButton
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:text="@string/btn_main_location"
+                android:id="@+id/button_location"
+                android:onClick="showLocation"
+                android:layout_gravity="center"
+                android:src="@drawable/location"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+                android:background="@drawable/button_purple" />
+
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:text="@string/btn_main_archive"
+            android:id="@+id/button4"
+
+            android:src="@drawable/archive"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/button_red" />
+
+        <ImageButton
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:text="@string/btn_main_voice"
+            android:id="@+id/button_speech"
+            android:onClick="speech"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:background="@drawable/button_black" />
+
+
+
+</RelativeLayout>
+
+
