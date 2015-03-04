@@ -18,6 +18,8 @@ package com.mobile.myweather.app;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -69,6 +71,11 @@ public class ShowWeather extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        android.support.v7.app.ActionBar actionBar;
+
+        actionBar = getSupportActionBar();
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#2f6699"));
+        actionBar.setBackgroundDrawable(colorDrawable);
 
     }
 
