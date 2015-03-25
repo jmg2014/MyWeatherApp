@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
 
 
 
@@ -25,7 +29,14 @@
             android:name=".ShowWeather"
             android:label="@string/title_activity_show_weather" >
         </activity>
-        <activity android:name=".PreferencesActivity"></activity>
+        <activity android:name=".PreferencesActivity" />
+        <activity
+            android:name=".WeatherMapActivity"
+            android:label="@string/title_activity_weather_map_activity" >
+        </activity>
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="@string/GoogleMapsKey"/>
     </application>
 
 </manifest>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.gms.maps.MapView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/thermometer"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/imageView2" />
+            <TextView
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:text="10° C"
+                android:layout_height="32dp"
+                 />
+            <ImageView
+                android:src="@drawable/i01d"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/imageView3" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/wind_flag"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/imageView4" />
+        <TextView
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:text="10 km/h"
+            android:layout_height="32dp"/>
+    </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

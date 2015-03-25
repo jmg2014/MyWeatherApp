@@ -43,6 +43,7 @@ import com.mobile.myweather.list.CustomList;
 import com.mobile.myweather.parser.RestClient;
 import com.mobile.myweather.parser.WeatherResponse;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -270,7 +271,10 @@ public class ShowWeather extends ActionBarActivity {
                             result.add("  "+String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp()-273.15).intValue())+"° C");
                             result.add(weatherResponse.getWeather().get(0).getMain());
                             result.add(weatherResponse.getName());
-                            result.add(String.valueOf(weatherResponse.getWind().getSpeed()*3.6+" km/h"));
+
+                            DecimalFormat df = new DecimalFormat("#.##");
+
+                            result.add(String.valueOf(df.format(weatherResponse.getWind().getSpeed()*3.6)+" km/h"));
                             result.add(String.valueOf(weatherResponse.getMain().getPressure() +" hPa"));
                             result.add(String.valueOf(weatherResponse.getMain().getHumidity()+" %"));
                     

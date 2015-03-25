@@ -17,4 +17,9 @@
     <string name="pref_location_label">Location</string>
     <string name="pref_location_key" translatable="false">location</string>
     <string name="pref_location_default" translatable="false">London,uk</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_weather_map">WeatherMapActivity</string>
+    <string name="title_activity_weather_map_activity">WeatherMap</string>
 </resources>

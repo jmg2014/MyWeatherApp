@@ -15,7 +15,6 @@
  */
 package com.mobile.myweather.app;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -137,10 +136,25 @@ public class MainActivity extends ActionBarActivity {
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
 
-        Toast toast = Toast.makeText(context, String.valueOf(location.getLatitude())+" , "+String.valueOf(location.getLongitude()), duration);
-        toast.show();
+        if (location!=null) {
+
+
+            Intent i = new Intent(this, WeatherMapActivity.class);
+            i.putExtra("latitude",location.getLatitude());
+            i.putExtra("longitude",location.getLongitude());
+
+            startActivity(i);
+        }
+        else {
+             Toast.makeText(context,"Unable to get the location", duration).show();
+
+
+
+        }
+
 
     }
+
     /** Called when the user clicks Voice button */
     public void speech(View view) {
 
