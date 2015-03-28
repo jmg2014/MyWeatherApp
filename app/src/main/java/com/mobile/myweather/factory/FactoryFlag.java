@@ -46,6 +46,12 @@ public class FactoryFlag {
             else if ("poland".equals(country)){
                 country="pl";
             }
+            else if ("france".equals(country)){
+                country="fr";
+            }
+            else if ("germany".equals(country)){
+                country="de";
+            }
             int result = res.getIdentifier(country, "drawable", context.getPackageName());
             if (result==0){
                 return R.drawable.eu;

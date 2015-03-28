@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -131,6 +132,8 @@ public class ShowWeather extends ActionBarActivity {
          * defined in the previous statement.
          */
         private ArrayAdapter<String> mListAdapter;
+
+        MediaPlayer mPlayer;
 
         public PlaceholderFragment() {
         }
@@ -251,6 +254,18 @@ public class ShowWeather extends ActionBarActivity {
                     R.drawable.moon
 
             };
+
+            //Sound
+            if (result.get(1).toLowerCase().contains("rain")) {
+                mPlayer = MediaPlayer.create(getActivity(), R.raw.rain);
+                mPlayer.start();
+
+            }
+            else if (result.get(1).toLowerCase().contains("clear")) {
+                mPlayer = MediaPlayer.create(getActivity(), R.raw.clear_sky);
+                mPlayer.start();
+            }
+
             CustomList adapter = new CustomList(getActivity(), data, imageId);
 
             mListView.setAdapter(adapter);
@@ -304,7 +319,7 @@ public class ShowWeather extends ActionBarActivity {
                                 builder.setTitle(getResources().getString(R.string.alert_title))
                                         .setMessage(mCountry+" : "+getResources().getString(R.string.alert_message))
                                         .setCancelable(false)
-                                        .setNegativeButton("Close",new DialogInterface.OnClickListener() {
+                                        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 Intent i = new Intent(getActivity(), MainActivity.class);
                                                 startActivity(i);
@@ -345,6 +360,13 @@ public class ShowWeather extends ActionBarActivity {
                     onRefreshComplete(result);//
                 }
             }
+        }
+        @Override
+        public void onDestroy() {
+
+            mPlayer.stop();
+            super.onDestroy();
+
         }
     }
 }
