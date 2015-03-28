@@ -18,6 +18,10 @@
     <string name="pref_location_key" translatable="false">location</string>
     <string name="pref_location_default" translatable="false">London,uk</string>
 
+    <!-- city no found alert-->
+    <string name="alert_title">Error!</string>
+    <string name="alert_message">City not found</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_weather_map">WeatherMapActivity</string>

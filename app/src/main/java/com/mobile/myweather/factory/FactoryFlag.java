@@ -38,7 +38,13 @@ public class FactoryFlag {
                 country="es";
             }
             else if ("united states of america".equals(country)){
-                country="es";
+                country="us";
+            }
+            else if ("morocco".equals(country)){
+                country="ma";
+            }
+            else if ("poland".equals(country)){
+                country="pl";
             }
             int result = res.getIdentifier(country, "drawable", context.getPackageName());
             if (result==0){

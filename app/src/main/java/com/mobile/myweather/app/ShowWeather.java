@@ -15,8 +15,10 @@
  */
 package com.mobile.myweather.app;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -40,6 +42,7 @@ import android.widget.Toast;
 import com.mobile.myweather.factory.FactoryFlag;
 import com.mobile.myweather.factory.FactoryWeather;
 import com.mobile.myweather.list.CustomList;
+import com.mobile.myweather.parser.Main;
 import com.mobile.myweather.parser.RestClient;
 import com.mobile.myweather.parser.WeatherResponse;
 
@@ -268,31 +271,52 @@ public class ShowWeather extends ActionBarActivity {
                         public void success(WeatherResponse weatherResponse, Response response) {
                             // success!
 
-                            result.add("  "+String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp()-273.15).intValue())+"° C");
-                            result.add(weatherResponse.getWeather().get(0).getMain());
-                            result.add(weatherResponse.getName());
+                            if (weatherResponse.getCod()==200) {
+                                result.add("  " + String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp() - 273.15).intValue()) + "° C");
+                                result.add(weatherResponse.getWeather().get(0).getMain());
+                                result.add(weatherResponse.getName());
 
-                            DecimalFormat df = new DecimalFormat("#.##");
+                                DecimalFormat df = new DecimalFormat("#.##");
 
-                            result.add(String.valueOf(df.format(weatherResponse.getWind().getSpeed()*3.6)+" km/h"));
-                            result.add(String.valueOf(weatherResponse.getMain().getPressure() +" hPa"));
-                            result.add(String.valueOf(weatherResponse.getMain().getHumidity()+" %"));
-                    
-                            long time=Long.valueOf(weatherResponse.getSys().getSunrise())*(long)1000;
-                            Date date = new Date(time);
-                            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-                            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+                                result.add(String.valueOf(df.format(weatherResponse.getWind().getSpeed() * 3.6) + " km/h"));
+                                result.add(String.valueOf(weatherResponse.getMain().getPressure() + " hPa"));
+                                result.add(String.valueOf(weatherResponse.getMain().getHumidity() + " %"));
 
-                            result.add(format.format(date)+" GMT");
+                                long time = Long.valueOf(weatherResponse.getSys().getSunrise()) * (long) 1000;
+                                Date date = new Date(time);
+                                SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+                                format.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-                            time=Long.valueOf(weatherResponse.getSys().getSunset())*(long)1000;
-                            date = new Date(time);
+                                result.add(format.format(date) + " GMT");
 
-                            result.add(format.format(date)+" GMT");
-                            result.add(weatherResponse.getWeather().get(0).getIcon());
-                            result.add(weatherResponse.getSys().getCountry());
+                                time = Long.valueOf(weatherResponse.getSys().getSunset()) * (long) 1000;
+                                date = new Date(time);
 
-                            Log.i("COUNTRY", weatherResponse.getSys().getCountry());
+                                result.add(format.format(date) + " GMT");
+                                result.add(weatherResponse.getWeather().get(0).getIcon());
+                                result.add(weatherResponse.getSys().getCountry());
+
+                                Log.i("COUNTRY", weatherResponse.getSys().getCountry());
+                            }
+                            else{
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle(getResources().getString(R.string.alert_title))
+                                        .setMessage(mCountry+" : "+getResources().getString(R.string.alert_message))
+                                        .setCancelable(false)
+                                        .setNegativeButton("Close",new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                Intent i = new Intent(getActivity(), MainActivity.class);
+                                                startActivity(i);
+                                                dialog.cancel();
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.setIcon(R.drawable.warning);
+                                alert.show();
+
+
+                            }
                         }
 
                         @Override
@@ -307,7 +331,7 @@ public class ShowWeather extends ActionBarActivity {
                 }
 
 
-                // Return a new random list of cheeses
+                // Return a new random list of values
                 return result;
             }
 
@@ -316,8 +340,10 @@ public class ShowWeather extends ActionBarActivity {
 
                 super.onPostExecute(result);
 
-                // Tell the Fragment that the refresh has completed
-                onRefreshComplete(result);//
+                if (result!=null && result.size()>0) {
+                    // Tell the Fragment that the refresh has completed
+                    onRefreshComplete(result);//
+                }
             }
         }
     }
