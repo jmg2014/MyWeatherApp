@@ -26,4 +26,9 @@ import retrofit.http.Query;
         void getWeather(@Query("q") String cityName,
                         Callback<WeatherResponse> callback);
 
+      @GET("/weather")
+      void getWeatherLatLng(@Query("lat") String latitude,
+                            @Query("lon") String longitude,
+                            Callback<WeatherResponse> callback);
+
 }

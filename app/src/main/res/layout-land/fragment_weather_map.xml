@@ -9,7 +9,7 @@
         android:id="@+id/map" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -21,35 +21,23 @@
             android:layout_gravity="center"
             android:id="@+id/weatherIcon"
             android:visibility="invisible" />
-        <LinearLayout
-            android:orientation="horizontal"
+
+        <ImageView
+            android:src="@drawable/thermometer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/temp_map"
+            android:visibility="invisible" />
+
+
+        <TextView
+            android:gravity="center"
             android:layout_width="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:src="@drawable/thermometer"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:id="@+id/temp_map"
-                android:visibility="invisible" />
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:text="10° C"
-                android:id="@+id/temp"
-                android:layout_height="48dp"
-                android:textStyle="bold"
-                android:visibility="invisible" />
-
-        </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_height="wrap_content">
+            android:text="10° C"
+            android:id="@+id/temp"
+            android:layout_height="48dp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
         <ImageView
             android:src="@drawable/wind_flag"
             android:layout_width="48dp"
@@ -64,7 +52,7 @@
             android:layout_height="48dp"
             android:textStyle="bold"
             android:visibility="invisible" />
-    </LinearLayout>
-    </LinearLayout>
+
+   </LinearLayout>
 
 </RelativeLayout>

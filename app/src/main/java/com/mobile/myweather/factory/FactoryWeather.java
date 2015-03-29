@@ -28,7 +28,7 @@ public class FactoryWeather {
         try {
 
             int result = res.getIdentifier("i"+icon, "drawable", context.getPackageName());
-            Log.i("ICON", icon);
+            Log.i("ICON_FACTORY", icon);
             if (result==0){
                 return R.drawable.i01d;
             }

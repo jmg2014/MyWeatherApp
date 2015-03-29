@@ -15,18 +15,25 @@
  */
 package com.mobile.myweather.app;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,6 +46,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
+import com.mobile.myweather.factory.FactoryWeather;
+import com.mobile.myweather.parser.RestClient;
+import com.mobile.myweather.parser.WeatherResponse;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class WeatherMapActivity extends ActionBarActivity  implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -49,10 +70,10 @@ public class WeatherMapActivity extends ActionBarActivity  implements
      */
     GoogleApiClient mGoogleApiClient;
     static Location mLastLocation;
+    static MediaPlayer mPlayer;
 
-
-    static Double  mLatitude = 0.0;
-    static  Double mLongitude=0.0;
+    static Double mLatitude = 0.0;
+    static Double mLongitude = 0.0;
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -61,18 +82,18 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                 .addApi(LocationServices.API)
                 .build();
     }
+
     @Override
     public void onConnected(Bundle connectionHint) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-           // mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-           // mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-           Toast.makeText(getApplicationContext(), String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_SHORT).show();
-            mLatitude=mLastLocation.getLatitude();
-            mLongitude=mLastLocation.getLongitude();
-        }
-        else{
+            // mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+            // mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            Toast.makeText(getApplicationContext(), String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+            mLatitude = mLastLocation.getLatitude();
+            mLongitude = mLastLocation.getLongitude();
+        } else {
             Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
         }
     }
@@ -81,10 +102,12 @@ public class WeatherMapActivity extends ActionBarActivity  implements
     public void onConnectionSuspended(int i) {
 
     }
+
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +115,7 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
         Intent intent = getIntent();
         mLatitude = intent.getExtras().getDouble("latitude");
-        mLongitude=intent.getExtras().getDouble("longitude");
+        mLongitude = intent.getExtras().getDouble("longitude");
 
         buildGoogleApiClient();
 
@@ -108,6 +131,8 @@ public class WeatherMapActivity extends ActionBarActivity  implements
         actionBar = getSupportActionBar();
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#2f6699"));
         actionBar.setBackgroundDrawable(colorDrawable);
+
+        new FetchWeatherTask().execute();
     }
 
 
@@ -136,13 +161,13 @@ public class WeatherMapActivity extends ActionBarActivity  implements
     }
 
 
-
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
         MapView mapView;
         GoogleMap map;
+
 
         public PlaceholderFragment() {
         }
@@ -157,15 +182,13 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
             MapsInitializer.initialize(getActivity());
 
-            switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) )
-            {
+            switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity())) {
                 case ConnectionResult.SUCCESS:
 
                     mapView = (MapView) v.findViewById(R.id.map);
                     mapView.onCreate(savedInstanceState);
                     // Gets to GoogleMap from the MapView and does initialization stuff
-                    if(mapView!=null)
-                    {
+                    if (mapView != null) {
                         map = mapView.getMap();
 
                         map.setMyLocationEnabled(true);
@@ -174,7 +197,7 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                         map.getUiSettings().setZoomControlsEnabled(true); //false to disable
                         map.getUiSettings().setCompassEnabled(false); //false to disable
                         //)
-                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mLatitude,mLongitude), 13);
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mLatitude, mLongitude), 13);
                         map.animateCamera(cameraUpdate);
 
                     }
@@ -185,28 +208,31 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                 case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
                     Toast.makeText(getActivity(), "UPDATE REQUIRED", Toast.LENGTH_SHORT).show();
                     break;
-                default: Toast.makeText(getActivity(), GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()), Toast.LENGTH_SHORT).show();
+                default:
+                    Toast.makeText(getActivity(), GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()), Toast.LENGTH_SHORT).show();
             }
-
-
 
 
             // Updates the location and zoom of the MapView
 
             return v;
         }
+
         @Override
         public void onResume() {
             mapView.onResume();
             super.onResume();
         }
+
         @Override
-          public void onDestroy() {
+        public void onDestroy() {
+            mPlayer.stop();
             super.onDestroy();
             mapView.onDestroy();
 
 
         }
+
         @Override
         public void onPause() {
             super.onPause();
@@ -215,11 +241,110 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
 
         }
+
         @Override
         public void onLowMemory() {
             super.onLowMemory();
             mapView.onLowMemory();
 
         }
+    }
+
+    private class FetchWeatherTask extends AsyncTask<Void, Void, List<String>> {
+        static final int TASK_DURATION = 3 * 1000; // 3 seconds
+
+        @Override
+        protected List<String> doInBackground(Void... params) {
+
+
+            final ArrayList<String> result = new ArrayList<String>();
+            // Sleep for a small amount of time to simulate a background-task
+            try {
+
+
+                RestClient.get().getWeatherLatLng(String.valueOf(mLatitude), String.valueOf(mLongitude), new Callback<WeatherResponse>() {
+                    @Override
+                    public void success(WeatherResponse weatherResponse, Response response) {
+                        // success!
+
+                        if (weatherResponse.getCod() == 200) {
+
+                            String temp = String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp() - 273.15).intValue()) + "° C";
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String wind = String.valueOf(df.format(weatherResponse.getWind().getSpeed() * 3.6) + " km/h");
+                            String icon = String.valueOf(weatherResponse.getWeather().get(0).getIcon());
+                            String status=weatherResponse.getWeather().get(0).getMain();
+
+                            result.add(temp);
+                            result.add(wind);
+                            result.add(icon);
+                            result.add(status);
+
+
+                            Log.i("COUNTRY", weatherResponse.getSys().getCountry());
+                        } else {
+
+                            Log.i("ERROR_COUNTRY", "ARsa");
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        // something went wrong
+                        //Log.e(LOG_TAG, error.getMessage());
+                    }
+                });
+                Thread.sleep(TASK_DURATION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+            // Return all the values needed to show the information
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> result) {
+
+            super.onPostExecute(result);
+
+            //Show icons
+            if (result != null && result.size() > 0) {
+                // Tell the Fragment that the refresh has completed
+                TextView temp=(TextView)findViewById(R.id.temp);
+                temp.setText(result.get(0));
+                temp.setVisibility(View.VISIBLE);
+
+                TextView wind=(TextView)findViewById(R.id.wind);
+                wind.setText(result.get(1));
+                wind.setVisibility(View.VISIBLE);
+
+                Log.i("ICON", result.get(2));
+                int identifier=FactoryWeather.getFlag(result.get(2), getResources(), WeatherMapActivity.this);
+                ImageView icon=(ImageView)findViewById(R.id.weatherIcon);
+                icon.setImageResource(identifier);
+                icon.setVisibility(View.VISIBLE);
+
+                ImageView temp_icon=(ImageView)findViewById(R.id.temp_map);
+                temp_icon.setVisibility(View.VISIBLE);
+
+                ImageView flag_icon=(ImageView)findViewById(R.id.flag_map);
+                flag_icon.setVisibility(View.VISIBLE);
+
+                //Sound
+                if (result.get(3).toLowerCase().contains("rain")) {
+                    mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.rain);
+                    mPlayer.start();
+
+                }
+                else if (result.get(3).toLowerCase().contains("clear")) {
+                    mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.clear_sky);
+                    mPlayer.start();
+                }
+
+            }
+        }
+
     }
 }
