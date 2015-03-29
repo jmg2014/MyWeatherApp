@@ -64,10 +64,8 @@ import retrofit.client.Response;
 public class WeatherMapActivity extends ActionBarActivity  implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    /*
-    https://developer.android.com/training/location/retrieve-current.html
-    http://www.coders-hub.com/2015/02/advance-android-google-map-2-tutorial-with-example.html#.VQ8c0_msWSo
-     */
+    private static String LOG_TAG=WeatherMapActivity.class.getSimpleName();
+
     GoogleApiClient mGoogleApiClient;
     static Location mLastLocation;
     static MediaPlayer mPlayer;
@@ -196,7 +194,7 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                         map.getUiSettings().setMyLocationButtonEnabled(true); //false to disable
                         map.getUiSettings().setZoomControlsEnabled(true); //false to disable
                         map.getUiSettings().setCompassEnabled(false); //false to disable
-                        //)
+
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mLatitude, mLongitude), 13);
                         map.animateCamera(cameraUpdate);
 
@@ -281,17 +279,17 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                             result.add(status);
 
 
-                            Log.i("COUNTRY", weatherResponse.getSys().getCountry());
+                            Log.i(LOG_TAG, weatherResponse.getSys().getCountry());
                         } else {
 
-                            Log.i("ERROR_COUNTRY", "ARsa");
+                            Log.i(LOG_TAG, "ERROR loading information");
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        // something went wrong
-                        //Log.e(LOG_TAG, error.getMessage());
+
+                        Log.e(LOG_TAG, error.getMessage());
                     }
                 });
                 Thread.sleep(TASK_DURATION);
