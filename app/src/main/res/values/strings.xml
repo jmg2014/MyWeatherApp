@@ -26,4 +26,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_weather_map">WeatherMapActivity</string>
     <string name="title_activity_weather_map_activity">WeatherMap</string>
+    <string name="title_activity_history">HistoryActivity</string>
 </resources>

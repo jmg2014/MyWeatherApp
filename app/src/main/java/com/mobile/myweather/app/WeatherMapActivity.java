@@ -15,8 +15,7 @@
  */
 package com.mobile.myweather.app;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -49,13 +48,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.mobile.myweather.factory.FactoryWeather;
 import com.mobile.myweather.parser.RestClient;
 import com.mobile.myweather.parser.WeatherResponse;
-
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
+
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -318,7 +314,7 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                 wind.setText(result.get(1));
                 wind.setVisibility(View.VISIBLE);
 
-                Log.i("ICON", result.get(2));
+
                 int identifier=FactoryWeather.getFlag(result.get(2), getResources(), WeatherMapActivity.this);
                 ImageView icon=(ImageView)findViewById(R.id.weatherIcon);
                 icon.setImageResource(identifier);

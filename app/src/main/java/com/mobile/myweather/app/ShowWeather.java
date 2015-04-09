@@ -16,14 +16,11 @@
 package com.mobile.myweather.app;
 
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -39,24 +36,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.mobile.myweather.factory.FactoryFlag;
 import com.mobile.myweather.factory.FactoryWeather;
 import com.mobile.myweather.list.CustomList;
-import com.mobile.myweather.parser.Main;
+import com.mobile.myweather.parser.Api;
 import com.mobile.myweather.parser.RestClient;
 import com.mobile.myweather.parser.WeatherResponse;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
+import retrofit.RestAdapter;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class ShowWeather extends ActionBarActivity {
 
@@ -223,141 +215,114 @@ public class ShowWeather extends ActionBarActivity {
              */
             new FetchWeatherTask().execute();
         }
-        /**
-         * When the AsyncTask finishes, it calls onRefreshComplete(), which updates the data in the
-         * ListAdapter and turns off the progress bar.
-         */
-        private void onRefreshComplete(List<String> result) {
-            Log.i(LOG_TAG, "onRefreshComplete");
 
-            // Remove all items from the ListAdapter, and then replace them with the new items
+        private class FetchWeatherTask extends AsyncTask<Void, Void, WeatherResponse> {
 
-            String[] data = {
-                    result.get(0),
-                    result.get(1),
-                    result.get(2),
-                    result.get(3),
-                    result.get(4),
-                    result.get(5),
-                    result.get(6),
-                    result.get(7)
-            } ;
-            //Update icons
-            Integer[] imageId = {
-                    R.drawable.thermometer,
-                    FactoryWeather.getFlag(result.get(8),getResources(),getActivity()),
-                    FactoryFlag.getFlag(result.get(9),getResources(),getActivity()),
-                    R.drawable.wind_flag,
-                    R.drawable.pressure,
-                    R.drawable.humidity,
-                    R.drawable.sunrise,
-                    R.drawable.moon
-
-            };
-
-            //Sound
-            if (result.get(1).toLowerCase().contains("rain")) {
-                mPlayer = MediaPlayer.create(getActivity(), R.raw.rain);
-                mPlayer.start();
-
-            }
-            else if (result.get(1).toLowerCase().contains("clear")) {
-                mPlayer = MediaPlayer.create(getActivity(), R.raw.clear_sky);
-                mPlayer.start();
-            }
-
-            CustomList adapter = new CustomList(getActivity(), data, imageId);
-
-            mListView.setAdapter(adapter);
-            // Stop the refreshing indicator
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-        private class FetchWeatherTask extends AsyncTask<Void, Void, List<String>> {
-            static final int TASK_DURATION = 3 * 1000; // 3 seconds
+            RestAdapter restAdapter;
             @Override
-            protected List<String>doInBackground(Void... params) {
-
-                final ArrayList<String> result=new ArrayList<String>();
-                // Sleep for a small amount of time to simulate a background-task
-                try {
-
-                    RestClient.get().getWeather(mCountry, new Callback<WeatherResponse>() {
-                        @Override
-                        public void success(WeatherResponse weatherResponse, Response response) {
-                            // success!
-
-                            if (weatherResponse.getCod()==200) {
-                                result.add("  " + String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp() - 273.15).intValue()) + "° C");
-                                result.add(weatherResponse.getWeather().get(0).getMain());
-                                result.add(weatherResponse.getName());
-
-                                DecimalFormat df = new DecimalFormat("#.##");
-
-                                result.add(String.valueOf(df.format(weatherResponse.getWind().getSpeed() * 3.6) + " km/h"));
-                                result.add(String.valueOf(weatherResponse.getMain().getPressure() + " hPa"));
-                                result.add(String.valueOf(weatherResponse.getMain().getHumidity() + " %"));
-
-                                long time = Long.valueOf(weatherResponse.getSys().getSunrise()) * (long) 1000;
-                                Date date = new Date(time);
-                                SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-                                format.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-                                result.add(format.format(date) + " GMT");
-
-                                time = Long.valueOf(weatherResponse.getSys().getSunset()) * (long) 1000;
-                                date = new Date(time);
-
-                                result.add(format.format(date) + " GMT");
-                                result.add(weatherResponse.getWeather().get(0).getIcon());
-                                result.add(weatherResponse.getSys().getCountry());
-
-                                Log.i("COUNTRY", weatherResponse.getSys().getCountry());
-                            }
-                            else{
-
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                builder.setTitle(getResources().getString(R.string.alert_title))
-                                        .setMessage(mCountry+" : "+getResources().getString(R.string.alert_message))
-                                        .setCancelable(false)
-                                        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                Intent i = new Intent(getActivity(), MainActivity.class);
-                                                startActivity(i);
-                                                dialog.cancel();
-                                            }
-                                        });
-                                AlertDialog alert = builder.create();
-                                alert.setIcon(R.drawable.warning);
-                                alert.show();
+            protected void onPreExecute() {
+                restAdapter = new RestAdapter.Builder()
+                        .setEndpoint(RestClient.ROOT)
+                        .build();
+            }
 
 
-                            }
-                        }
+            @Override
+            protected WeatherResponse doInBackground(Void... params) {
 
-                        @Override
-                        public void failure(RetrofitError error) {
-                            // something went wrong
-                            Log.e(LOG_TAG,error.getMessage());
-                        }
-                    });
-                    Thread.sleep(TASK_DURATION);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                Api methods = restAdapter.create(Api.class);
+                WeatherResponse weather = methods.getWeather(mCountry);
+
+                return weather;
+            }
+
+            @Override
+            protected void onPostExecute(WeatherResponse weatherResponse) {
+
+                if (weatherResponse!=null  && weatherResponse.getCod() ==200) {
+
+                    ArrayList<String> result = new ArrayList<String>();
+
+                    result.add("  " + String.valueOf(Double.valueOf(weatherResponse.getMain().getTemp() - 273.15).intValue()) + "° C");
+                    result.add(weatherResponse.getWeather().get(0).getMain());
+                    result.add(weatherResponse.getName());
+
+                    DecimalFormat df = new DecimalFormat("#.##");
+
+                    result.add(String.valueOf(df.format(weatherResponse.getWind().getSpeed() * 3.6) + " km/h"));
+                    result.add(String.valueOf(weatherResponse.getMain().getPressure() + " hPa"));
+                    result.add(String.valueOf(weatherResponse.getMain().getHumidity() + " %"));
+
+                    long time = Long.valueOf(weatherResponse.getSys().getSunrise()) * (long) 1000;
+                    Date date = new Date(time);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+                    format.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+                    result.add(format.format(date) + " GMT");
+
+                    time = Long.valueOf(weatherResponse.getSys().getSunset()) * (long) 1000;
+                    date = new Date(time);
+
+                    result.add(format.format(date) + " GMT");
+                    result.add(weatherResponse.getWeather().get(0).getIcon());
+                    result.add(weatherResponse.getSys().getCountry());
+
+
+                    String[] data = {
+                            result.get(0),
+                            result.get(1),
+                            result.get(2),
+                            result.get(3),
+                            result.get(4),
+                            result.get(5),
+                            result.get(6),
+                            result.get(7)
+                    };
+                    //Update icons
+                    Integer[] imageId = {
+                            R.drawable.thermometer,
+                            FactoryWeather.getFlag(result.get(8), getResources(), getActivity()),
+                            FactoryFlag.getFlag(result.get(9), getResources(), getActivity()),
+                            R.drawable.wind_flag,
+                            R.drawable.pressure,
+                            R.drawable.humidity,
+                            R.drawable.sunrise,
+                            R.drawable.moon
+
+                    };
+
+                    //Sound
+                    if (result.get(1).toLowerCase().contains("rain")) {
+                        mPlayer = MediaPlayer.create(getActivity(), R.raw.rain);
+                        mPlayer.start();
+
+                    } else if (result.get(1).toLowerCase().contains("clear")) {
+                        mPlayer = MediaPlayer.create(getActivity(), R.raw.clear_sky);
+                        mPlayer.start();
+                    }
+
+                    CustomList adapter = new CustomList(getActivity(), data, imageId);
+
+                    mListView.setAdapter(adapter);
+                    // Stop the refreshing indicator
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
-
-
-                // Return a new random list of values
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(List<String> result) {
-
-                super.onPostExecute(result);
-
-                if (result!=null && result.size()>0) {
-                    // Tell the Fragment that the refresh has completed
-                    onRefreshComplete(result);//
+                //it was a error
+                else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle(getResources().getString(R.string.alert_title))
+                            .setMessage(mCountry+" : "+getResources().getString(R.string.alert_message))
+                            .setCancelable(false)
+                            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent i = new Intent(getActivity(), MainActivity.class);
+                                    startActivity(i);
+                                    dialog.cancel();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.setIcon(R.drawable.warning);
+                    alert.show();
                 }
             }
         }

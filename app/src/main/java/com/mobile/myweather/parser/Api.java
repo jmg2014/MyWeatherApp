@@ -23,12 +23,12 @@ import retrofit.http.Query;
   public interface Api {
 
         @GET("/weather")
-        void getWeather(@Query("q") String cityName,
-                        Callback<WeatherResponse> callback);
+        WeatherResponse getWeather(@Query("q") String cityName);
 
-      @GET("/weather")
-      void getWeatherLatLng(@Query("lat") String latitude,
+       @GET("/weather")
+       void getWeatherLatLng(@Query("lat") String latitude,
                             @Query("lon") String longitude,
                             Callback<WeatherResponse> callback);
+
 
 }
