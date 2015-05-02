@@ -220,7 +220,10 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
         @Override
         public void onDestroy() {
-            mPlayer.stop();
+            if (mPlayer!=null) {
+                mPlayer.stop();
+            }
+
             super.onDestroy();
             mapView.onDestroy();
 
