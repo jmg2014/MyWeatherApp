@@ -46,6 +46,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import retrofit.RestAdapter;
 
@@ -189,7 +190,7 @@ public class ShowWeather extends ActionBarActivity {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                    // Toast.makeText( getActivity(), "You Clicked at " + web[+position], Toast.LENGTH_SHORT).show();
-                    Toast.makeText( getActivity(), "You Clicked " , Toast.LENGTH_SHORT).show();
+                    Toast.makeText( getActivity(), "You Clicked "+parent.getItemAtPosition(2).toString() , Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -229,9 +230,13 @@ public class ShowWeather extends ActionBarActivity {
 
             @Override
             protected WeatherResponse doInBackground(Void... params) {
-
-                Api methods = restAdapter.create(Api.class);
-                WeatherResponse weather = methods.getWeather(mCountry);
+                WeatherResponse weather;
+                try {
+                    Api methods = restAdapter.create(Api.class);
+                     weather = methods.getWeather(mCountry);
+                }catch (Exception ex){
+                    weather=null;
+                }
 
                 return weather;
             }
@@ -253,17 +258,19 @@ public class ShowWeather extends ActionBarActivity {
                     result.add(String.valueOf(weatherResponse.getMain().getPressure() + " hPa"));
                     result.add(String.valueOf(weatherResponse.getMain().getHumidity() + " %"));
 
+                    TimeZone zone=TimeZone.getDefault();
+
                     long time = Long.valueOf(weatherResponse.getSys().getSunrise()) * (long) 1000;
                     Date date = new Date(time);
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-                    format.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    format.setTimeZone(TimeZone.getTimeZone(zone.getID()));
 
-                    result.add(format.format(date) + " GMT");
+                    result.add(format.format(date) + " " + zone.getDisplayName(false, TimeZone.SHORT, Locale.getDefault()));
 
                     time = Long.valueOf(weatherResponse.getSys().getSunset()) * (long) 1000;
                     date = new Date(time);
 
-                    result.add(format.format(date) + " GMT");
+                    result.add(format.format(date) +" "+ zone.getDisplayName(false, TimeZone.SHORT, Locale.getDefault()));
                     result.add(weatherResponse.getWeather().get(0).getIcon());
                     result.add(weatherResponse.getSys().getCountry());
 
@@ -304,6 +311,11 @@ public class ShowWeather extends ActionBarActivity {
                     CustomList adapter = new CustomList(getActivity(), data, imageId);
 
                     mListView.setAdapter(adapter);
+
+
+
+
+
                     // Stop the refreshing indicator
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -324,6 +336,9 @@ public class ShowWeather extends ActionBarActivity {
                     alert.setIcon(R.drawable.warning);
                     alert.show();
                 }
+
+
+
             }
         }
         @Override

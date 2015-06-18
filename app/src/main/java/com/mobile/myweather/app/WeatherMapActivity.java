@@ -38,6 +38,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -58,13 +60,14 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class WeatherMapActivity extends ActionBarActivity  implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
     private static String LOG_TAG=WeatherMapActivity.class.getSimpleName();
 
-    GoogleApiClient mGoogleApiClient;
+    private static GoogleApiClient mGoogleApiClient;
     static Location mLastLocation;
     static MediaPlayer mPlayer;
+    private static LocationRequest mLocationRequest;
 
     static Double mLatitude = 0.0;
     static Double mLongitude = 0.0;
@@ -79,8 +82,12 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+        mLocationRequest=LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(1800000);//30 minutes
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
             // mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
             // mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
@@ -91,15 +98,22 @@ public class WeatherMapActivity extends ActionBarActivity  implements
             Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
         }
     }
+    @Override
+    public void onLocationChanged(Location location) {
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
 
+        Log.i(LOG_TAG, "Connection suspended");
+        mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+       Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
 
     @Override
@@ -153,6 +167,7 @@ public class WeatherMapActivity extends ActionBarActivity  implements
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
     /**
@@ -244,6 +259,20 @@ public class WeatherMapActivity extends ActionBarActivity  implements
             super.onLowMemory();
             mapView.onLowMemory();
 
+        }
+        @Override
+        public void onStart(){
+            super.onStart();
+            mGoogleApiClient.connect();
+
+        }
+        @Override
+        public void onStop(){
+
+            super.onStop();
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.disconnect();
+            }
         }
     }
 
