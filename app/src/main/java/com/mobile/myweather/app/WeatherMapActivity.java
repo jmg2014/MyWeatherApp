@@ -16,10 +16,12 @@
 package com.mobile.myweather.app;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
@@ -359,15 +361,26 @@ public class WeatherMapActivity extends ActionBarActivity  implements
                 flag_icon.setVisibility(View.VISIBLE);
 
                 //Sound
-                if (result.get(3).toLowerCase().contains("rain")) {
-                    mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.rain);
-                    mPlayer.start();
+                AudioManager audio = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+                switch( audio.getRingerMode() ){
+                    case AudioManager.RINGER_MODE_NORMAL:
+                        if (result.get(3).toLowerCase().contains("rain")) {
+                            mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.rain);
+                            mPlayer.start();
 
+                        }
+                        else if (result.get(3).toLowerCase().contains("clear")) {
+                            mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.clear_sky);
+                            mPlayer.start();
+                        }
+                        break;
+                    case AudioManager.RINGER_MODE_SILENT:
+                        break;
+                    case AudioManager.RINGER_MODE_VIBRATE:
+                        break;
                 }
-                else if (result.get(3).toLowerCase().contains("clear")) {
-                    mPlayer = MediaPlayer.create(WeatherMapActivity.this, R.raw.clear_sky);
-                    mPlayer.start();
-                }
+
+
 
             }
         }

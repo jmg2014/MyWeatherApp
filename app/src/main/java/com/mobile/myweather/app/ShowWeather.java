@@ -16,10 +16,12 @@
 package com.mobile.myweather.app;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -298,15 +300,25 @@ public class ShowWeather extends ActionBarActivity {
 
                     };
 
-                    //Sound
-                    if (result.get(1).toLowerCase().contains("rain")) {
-                        mPlayer = MediaPlayer.create(getActivity(), R.raw.rain);
-                        mPlayer.start();
+                    AudioManager audio = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+                    switch( audio.getRingerMode() ){
+                        case AudioManager.RINGER_MODE_NORMAL:
+                            //Sound
+                            if (result.get(1).toLowerCase().contains("rain")) {
+                                mPlayer = MediaPlayer.create(getActivity(), R.raw.rain);
+                                mPlayer.start();
 
-                    } else if (result.get(1).toLowerCase().contains("clear")) {
-                        mPlayer = MediaPlayer.create(getActivity(), R.raw.clear_sky);
-                        mPlayer.start();
+                            } else if (result.get(1).toLowerCase().contains("clear")) {
+                                mPlayer = MediaPlayer.create(getActivity(), R.raw.clear_sky);
+                                mPlayer.start();
+                            }
+                            break;
+                        case AudioManager.RINGER_MODE_SILENT:
+                            break;
+                        case AudioManager.RINGER_MODE_VIBRATE:
+                            break;
                     }
+
 
                     CustomList adapter = new CustomList(getActivity(), data, imageId);
 
