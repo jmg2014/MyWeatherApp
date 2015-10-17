@@ -93,7 +93,9 @@ public class WeatherMapActivity extends ActionBarActivity  implements
         if (mLastLocation != null) {
             // mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
             // mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-            Toast.makeText(getApplicationContext(), String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), String.valueOf(mLastLocation.getLatitude())
+                    +" , "+String.valueOf(mLastLocation.getLongitude())
+                    , Toast.LENGTH_SHORT).show();
             mLatitude = mLastLocation.getLatitude();
             mLongitude = mLastLocation.getLongitude();
         } else {
@@ -290,7 +292,9 @@ public class WeatherMapActivity extends ActionBarActivity  implements
             try {
 
 
-                RestClient.get().getWeatherLatLng(String.valueOf(mLatitude), String.valueOf(mLongitude), new Callback<WeatherResponse>() {
+                RestClient.get().getWeatherLatLng(String.valueOf(mLatitude), String.valueOf(mLongitude),
+                        getResources().getString(R.string.OpenWeatherApiKey),
+                        new Callback<WeatherResponse>() {
                     @Override
                     public void success(WeatherResponse weatherResponse, Response response) {
                         // success!

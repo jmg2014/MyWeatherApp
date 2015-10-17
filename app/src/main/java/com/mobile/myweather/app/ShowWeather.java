@@ -235,8 +235,10 @@ public class ShowWeather extends ActionBarActivity {
                 WeatherResponse weather;
                 try {
                     Api methods = restAdapter.create(Api.class);
-                     weather = methods.getWeather(mCountry);
+                     weather = methods.getWeather(mCountry,getResources().getString(R.string.OpenWeatherApiKey));
                 }catch (Exception ex){
+
+
                     weather=null;
                 }
 
